@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "medsplain"
+version = "0.1.0"
+description = "Plain-English medication list summaries and printable charts (education only, not medical advice)."
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [{name = "Asdale Dynamics, LLC"}]
+keywords = ["medication", "summary", "chart", "ollama", "llm", "cli", "health-education"]
+
+[project.scripts]
+medsplain = "medsplain.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

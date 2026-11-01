@@ -24,7 +24,7 @@ http://localhost:11434/v1).
 ## How to run
 
 ```bash
-# install (isolated venv recommended)
+# install (isolated venv recommended; system Python is PEP 668 managed)
 python3 -m venv .venv
 source .venv/bin/activate
 pip install .
@@ -40,25 +40,28 @@ Endpoint example: `medsplain summarize -i meds.txt --endpoint http://localhost:1
 
 ## Verification results
 
-- `pip install -e .` - OK (built and installed in a venv; system Python is
-  PEP 668 externally managed, so a venv is required).
-- `python3 -m unittest discover -s tests -v` - OK: 10 tests, 10 passed,
-  covering name/dose/frequency/time parsing, case insensitivity, comment and
-  blank line handling, name-only lines, and multi-line lists.
+- `pip install -e .` - OK (builds and installs in a venv).
+- `python3 -m unittest discover -s tests -v` - OK: 23 tests, 23 passed
+  (10 parser tests + 13 formatter tests), covering name/dose/frequency/time
+  parsing, case insensitivity, comment and blank line handling, name-only
+  lines, multi-line lists, word-boundary chart truncation, chart bucket
+  placement, SVG structure, and disclaimer presence in every output format.
 - CLI smoke test (offline, no Ollama running): `summarize` prints a full
   summary with disclaimer and falls back to the local fallback summary;
   `chart --format svg` produces a valid SVG (parsed with xml.dom.minidom);
-  `chart --format text` prints a readable schedule chart.
+  `chart --format text` prints a readable schedule chart with no mid-word
+  truncation.
+- `medsplain --help` and `medsplain summarize --help` render cleanly.
 - No .github/workflows added. No secrets, API keys, or personal data in any
-  file. Git initialized with one commit, identity Dylan Asdale
+  file. Git initialized, two commits, identity Dylan Asdale
   (dylanasdale@users.noreply.github.com), no remote, not pushed.
 
 ## Known gaps
 
 - No Ollama server available in this environment, so the LLM code path was
   not exercised end-to-end; the offline fallback path was verified instead.
-- Chart text cells are fixed-width (34 chars); very long entries may
-  truncate.
+- Chart text cells are fixed-width (34 chars) and wrap at word boundaries;
+  very long entries still wrap across rows.
 - SVG chart is basic (no color coding by day, no per-day columns).
 - Parser is heuristic: unusual medication names or free-form wording may
   parse partially; always verify parsed output against the prescription
@@ -68,8 +71,9 @@ Endpoint example: `medsplain summarize -i meds.txt --endpoint http://localhost:1
 ## Files
 
 - LICENSE - MIT, Copyright (c) 2026 Asdale Dynamics, LLC
-- README.md - usage, disclaimer, credits Asdale Dynamics, LLC
+- README.md - usage, disclaimer, example output, credits Asdale Dynamics, LLC
 - pyproject.toml - package metadata + `medsplain` console script
 - src/medsplain/ - CLI, LLM client, parser, formatters, disclaimer
 - tests/test_parser.py - 10 parser tests
+- tests/test_formatter.py - 13 formatter tests
 - .gitignore - venv and build artifacts

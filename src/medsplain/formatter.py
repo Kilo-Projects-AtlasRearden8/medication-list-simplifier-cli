@@ -60,6 +60,19 @@ def _bucket_for(med: Medication) -> set[str]:
     return buckets
 
 
+def _fit_cell(text: str, width: int) -> str:
+    if len(text) <= width:
+        return text
+    words = text.split()
+    result = ""
+    for word in words:
+        candidate = (result + " " + word).strip()
+        if len(candidate) > width:
+            break
+        result = candidate
+    return result if result else text[:width]
+
+
 def format_chart_text(medications: list[Medication]) -> str:
     buckets = {name: [] for name in BUCKET_ORDER}
     for med in medications:
@@ -84,7 +97,7 @@ def format_chart_text(medications: list[Medication]) -> str:
         row = ""
         for name in BUCKET_ORDER:
             med = buckets[name][i] if i < len(buckets[name]) else None
-            cell = med.summary_line()[:width] if med else ""
+            cell = _fit_cell(med.summary_line(), width) if med else ""
             row += cell.ljust(width)
         lines.append(row)
     lines.append("")

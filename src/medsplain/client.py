@@ -70,7 +70,7 @@ class LLMClient:
             if not text:
                 raise ValueError("empty completion")
             return LLMResponse(text=text, source="llm")
-        except Exception:
+        except (urllib.error.URLError, OSError, json.JSONDecodeError, KeyError, ValueError, IndexError):
             return LLMResponse(text=self._fallback_summary(medications), source="fallback")
 
     @staticmethod
